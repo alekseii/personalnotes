@@ -4,6 +4,14 @@ import json
 PERMANENT_CACHE_FNAME = "permanent_cache.txt"
 TEMP_CACHE_FNAME = "this_page_cache.txt"
 
+def requestURL(baseurl, params = {}):
+    # This function accepts a URL path and a params diction as inputs.
+    # It calls requests.get() with those inputs,
+    # and returns the full URL of the data you want to get.
+    req = requests.Request(method = 'GET', url = baseurl, params = params)
+    prepped = req.prepare()
+    return prepped.url
+
 def _write_to_file(cache, fname):
     with open(fname, 'w') as outfile:
         outfile.write(json.dumps(cache, indent=2))
@@ -36,7 +44,7 @@ def make_cache_key(baseurl, params_d, private_keys=["api_key"]):
     return baseurl + "_".join(res)
 
 def get(baseurl, params={}, private_keys_to_ignore=["api_key"], permanent_cache_file=PERMANENT_CACHE_FNAME, temp_cache_file=TEMP_CACHE_FNAME):
-    full_url = requests.requestURL(baseurl, params)
+    full_url = requestURL(baseurl, params)
     cache_key = make_cache_key(baseurl, params, private_keys_to_ignore)
     # Load the permanent and page-specific caches from files
     permanent_cache = _read_from_file(permanent_cache_file)
@@ -44,11 +52,17 @@ def get(baseurl, params={}, private_keys_to_ignore=["api_key"], permanent_cache_
     if cache_key in temp_cache:
         print("found in temp_cache")
         # make a Response object containing text from the change, and the full_url that would have been fetched
-        return requests.Response(temp_cache[cache_key], full_url)
+        resp = requests.Response()
+        resp.url = full_url
+        resp._content = str.encode(temp_cache[cache_key])
+        return resp.json()
     elif cache_key in permanent_cache:
         print("found in permanent_cache")
         # make a Response object containing text from the change, and the full_url that would have been fetched
-        return requests.Response(permanent_cache[cache_key], full_url)
+        resp = requests.Response()
+        resp.url = full_url
+        resp._content = str.encode(permanent_cache[cache_key])
+        return resp
     else:
         print("new; adding to cache")
         # actually request it

@@ -16,14 +16,6 @@ def get_synonym(word):
     #else just return original input
     return word
 
-def requestURL(baseurl, params = {}):
-    # This function accepts a URL path and a params diction as inputs.
-    # It calls requests.get() with those inputs,
-    # and returns the full URL of the data you want to get.
-    req = requests.Request(method = 'GET', url = baseurl, params = params)
-    prepped = req.prepare()
-    return prepped.url
-
 preppedURL = requestURL('https://www.google.com/search', params = {'tab':'isch', 'q':'"violins and guitars"'})
 
 resp = requests.get(preppedURL)
