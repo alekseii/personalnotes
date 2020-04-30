@@ -6,5 +6,6 @@ A personal repo.
 This file.
 
 ### python
-Python snippets:
-* `restapi.py` - simple snippet to fetch JSON data from REST API
+simple Python starter snippets for common tasks:
+* `restapi.py` - fetch JSON data from REST API
+* `sqlite.py` - open/create and interact with SQLite db
